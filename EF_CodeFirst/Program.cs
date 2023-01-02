@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 //4. DB nin serverda oluşması için PM de update-database komutu veya MigrateAsync metoduylada migration dosyaları çalıştırılır, db oluşturulur. 
 //MigrateAsync metodu ile oluşturmak çok mantıklı, çünkü uygulama ilk ayağa kalkarken db yi oluşturuyorsun
 
-//********DETAY
+//********MİGRATİON DETAY
 
 //migration oluşturmak için PM de => add-migration 'migration_adi' --outputdir klasor_adi
 //add-migration 'ecommerce_mig_1' -outputdir migs
@@ -23,3 +23,20 @@ using Microsoft.EntityFrameworkCore;
 //package-manager dan db yi üretebildiğimiz gibi aşağıdaki komut gibi de db yi üretebiliriz
 ECommerceDbContext context = new();
 await context.Database.MigrateAsync();
+
+//********CHANGE TRACKER
+var customer = new Customer();
+//ef nin tüm entityler statelerinin listesini döner =>  context.ChangeTracker.Entries().ToList();
+
+//context.SaveChangesAsync(false); => acceptAllChangesOnSuccess parametresini false set edersen şu anlama gelir. db de başarılı ya da başarısız kaydetme işlemi olursa entityler üzerindeki tracking i kaybetme
+//trackingi bitirmek için context.ChangeTracker.AcceptAllChanges();metodu çağrılır. SaveChangesAsync de true çağrılırsa otomatik AcceptAllChanges metodu çağrılır
+
+// entity lerde değişiklik var mı diye kontrol eder => context.ChangeTracker.HasChanges();
+
+//entity nin herhangi bir property sinin db deki orjinal değerini almak için =>  context.Entry(customer).OriginalValues.GetValue<string>(nameof(Customer.Name));
+
+//entity nin db deki orjinal hali => var dbCustomer = await context.Entry(customer).GetDatabaseValuesAsync();
+
+
+//eğer entityler üzerinde herhangi bir işlem (insert,update veya delete ) yapılmıayacksa MUTLAKA kullan => var customers=context.Customers.AsNoTracking().ToList();
+//eğer entiyler üzerinde change track olmasını istiyorsan => context.Customers.AsTracking().ToList();
