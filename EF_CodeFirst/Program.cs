@@ -40,3 +40,14 @@ var customer = new Customer();
 
 //eğer entityler üzerinde herhangi bir işlem (insert,update veya delete ) yapılmıayacksa MUTLAKA kullan => var customers=context.Customers.AsNoTracking().ToList();
 //eğer entiyler üzerinde change track olmasını istiyorsan => context.Customers.AsTracking().ToList();
+
+//******** 1-N çoklu ilişkili tablo data ekleme
+//1 tane department eklediğimizde Customers array ide eklediğimiz customerlarda otomatik olarak db ye eklenecektir
+var department = new Department
+{
+    Name = "IT",
+    Customers = new[] { customer, new Customer { Name = "Ayaz Ege" } },
+};
+
+await context.Departments.AddAsync(department);
+await context.SaveChangesAsync();
