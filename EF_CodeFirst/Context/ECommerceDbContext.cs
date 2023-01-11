@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.Extensions.Logging;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -26,6 +27,7 @@ namespace EF_CodeFirst.Context
 
             optionsBuilder.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);//entity lerdeki change tracker i kapatır. hiç bir nesne takip edilmez. defaultı tracking 
 
+            optionsBuilder.UseLoggerFactory(loggerFactory);
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -40,6 +42,9 @@ namespace EF_CodeFirst.Context
             //IEntityTypeConfiguration interface den türeyen class ları ilgili çalışan assembly içinde bulur, ayarları uygulamasına yardımcı olur
             modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
         }
+
+        // **** linq te ürettiğimiz sorguları console da sql hali ile görmek için "Microsoft.Extensions.Logging.Console" nuget paketini yükle ve onconfiguring de optionsBuilder.UseLoggerFactory(loggerFactory); kulland
+        readonly ILoggerFactory loggerFactory = LoggerFactory.Create(builder => builder.AddConsole());
     }
 
     //department-customer arasında 1-N ilişki var. 1 departmentda 1 den fazla customer
@@ -54,6 +59,9 @@ namespace EF_CodeFirst.Context
     }
 
     //table anotation ı kullanmaya gerek yok tablo adını farklı vermek istersen kullanabilirsin
+    [Index(nameof(Name))]//name e göre nonclustured index
+    [Index(nameof(Surname))]//surnamename e göre nonclustured index
+    [Index(nameof(Name), nameof(Surname)]//name ve surname göre nonclustured index
     [Table("Musteri")]
     public class Customer
     {
